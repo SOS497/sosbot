@@ -10,7 +10,7 @@ import gspread
 # Important notes about authenticating gspread (used for Google Sheets access):
 #      https://docs.gspread.org/en/latest/oauth2.html#for-bots-using-service-account
 #######################################################################################
-DEFAULT_CONFIG = join(environ["HOME"], ".config/sauced/config.yaml")
+DEFAULT_CONFIG = join(environ["HOME"], ".config/sosbot/config.yaml")
 GOOGLE_SCOPES = [
     'https://www.googleapis.com/auth/spreadsheets',
     'https://www.googleapis.com/auth/drive',

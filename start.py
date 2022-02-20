@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 
-from sauced.bot import load_bot
-from sauced.cogs.definitions import DefinitionCog
-from sauced.cogs.datasets import DatasetCog
+from sosbot.bot import load_bot
+from sosbot.cogs.definitions import DefinitionCog
+from sosbot.cogs.datasets import DatasetCog
 
 bot = load_bot()
 bot.discord.add_cog(DefinitionCog(bot))
 bot.discord.add_cog(DatasetCog(bot))
 
-print("Starting sauced Discord bot.")
+print("Starting sosbot for Discord.")
 bot.discord.start()

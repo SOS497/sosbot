@@ -5,7 +5,7 @@ import re
 from math import floor
 from datetime import datetime as dt
 
-from sauced.bot import (SaucedBot, CONFIG_DEFINITION_GSHEET)
+from sosbot.bot import (SaucedBot, CONFIG_DEFINITION_GSHEET)
 
 logging.basicConfig(level=logging.INFO)
 
@@ -134,7 +134,7 @@ class DefinitionCog(commands.Cog, name="Glossary Commands"):
                             break
 
                 if response is None:
-                    await message.reply(f"'{term}' is not defined!")
+                    await message.reply(f"'{term}' is not defined, but this might help:\nhttps://duckduckgo.com/?q=%22{term}%22+USD497+KSDE+Kansas")
                 else:
                     await message.reply(response)
             except Exception as e:

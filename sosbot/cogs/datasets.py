@@ -5,7 +5,7 @@ import re
 from math import floor
 from datetime import datetime as dt
 
-from sauced.bot import (SaucedBot, CONFIG_DATASET_GSHEET)
+from sosbot.bot import (SaucedBot, CONFIG_DATASET_GSHEET)
 
 logging.basicConfig(level=logging.INFO)
 

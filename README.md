@@ -1,4 +1,4 @@
-# sauced - SOSd Discord bot
+# sosbot - SOS 497's Discord bot
 
 This bot is designed to work with Google Sheets to track definitions for terms and links + descriptions associated with different datasets or topics.
 
@@ -13,7 +13,7 @@ discord:
   token: "SOME-TOKEN"
 
 google:
-  creds-json: "/home/USER/.config/sauced/google-creds.json"
+  creds-json: "/home/USER/.config/sosbot/google-creds.json"
 
   definitions-sheet: "SHEET-ID-FROM-URL"
   datasets-sheet: "SHEET-ID-FROM-URL"
@@ -32,15 +32,15 @@ Once you have a Google service account, you'll need to click on the `Keys` tab f
 Currently, to run this bot, you have to setup a virtualenv and install the dependencies:
 
 ```bash
-$ python -m venv sauced-venv
+$ python -m venv sosbot-venv
 [...]
-$ source sauced-venv/bin/activate
+$ source sosbot-venv/bin/activate
 $ pip install -r ./requirements.txt
 ````
 
 Then, you can run the bot itself with:
 
 ```bash
-$ source ./sauced-venv/bin/activate
+$ source ./sosbot-venv/bin/activate
 $ ./start.py
 ```
