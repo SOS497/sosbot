@@ -1,3 +1,6 @@
+[![CodeQL](https://github.com/SOS497/sosbot/actions/workflows/codeql-analysis.yml/badge.svg?branch=main)](https://github.com/SOS497/sosbot/actions/workflows/codeql-analysis.yml)
+[![Snyk Scan](https://github.com/SOS497/sosbot/actions/workflows/snyk-scan.yml/badge.svg)](https://github.com/SOS497/sosbot/actions/workflows/snyk-scan.yml)
+
 # sosbot - SOS 497's Discord bot
 
 This bot is designed to work with Google Sheets to track definitions for terms and links + descriptions associated with different datasets or topics.
