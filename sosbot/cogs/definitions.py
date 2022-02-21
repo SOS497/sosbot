@@ -1,11 +1,14 @@
-from discord.ext import commands
-import discord.message as mess
+"""Commands to handle saving, retrieving, and maintaining term definitions into a Google Sheet"""
 import logging
-import re
+# pylint: disable=no-name-in-module
 from math import floor
+import re
 from datetime import datetime as dt
 
-from sosbot.bot import (SaucedBot, CONFIG_DEFINITION_GSHEET)
+import discord.message as mess
+from discord.ext import commands
+
+from sosbot.bot import (SOSBot, CONFIG_DEFINITION_GSHEET)
 
 logging.basicConfig(level=logging.INFO)
 
@@ -16,7 +19,11 @@ SHEETS = [
 
 
 class DefinitionCog(commands.Cog, name="Glossary Commands"):
-    def __init__(self, bot: SaucedBot):
+    """Cog containing logic for managing and retrieving term definitions"""
+
+    def __init__(self, bot: SOSBot):
+        """Initialize the cog, including the gspread service used to access the Sheet"""
+
         self.bot = bot.discord.bot
         self.definitions = bot.google.config.get(CONFIG_DEFINITION_GSHEET)
         self.sheets_service = bot.google.get_gspread()
@@ -51,16 +58,19 @@ class DefinitionCog(commands.Cog, name="Glossary Commands"):
                             await message.reply(f"{term} is already defined!")
                             return
 
-                    sheet.append_row([term, definition, message.author.display_name, dt.now().strftime("%x")])
-                    sheet.sort((1, 'asc'), range=f"A2:D{len(rows)+2}")
+                    sheet.append_row(
+                        [term, definition, message.author.display_name, dt.now().strftime("%x")])
+                    sheet.sort((1, 'asc'), range=f"A2:D{len(rows) + 2}")
 
                 await message.reply(f"'{term}' is now defined as '{definition}'")
-            except Exception as e:
-                print(e)
+            # pylint: disable=broad-except
+            except Exception as error:
+                print(error)
                 try:
                     await message.reply("Sorry, an error has occurred.")
-                except Exception as e2:
-                    print(e2)
+                # pylint: disable=broad-except
+                except Exception as safe_error:
+                    print(safe_error)
 
     @commands.command("undefine")
     async def clear_definition(self, ctx: commands.Context):
@@ -93,16 +103,18 @@ class DefinitionCog(commands.Cog, name="Glossary Commands"):
                             break
 
                 if term_index > -1:
-                    sheet.delete_row(term_index+2)
+                    sheet.delete_row(term_index + 2)
                     await message.reply(f"The definition of '{term}' has been removed.")
                 else:
                     await message.reply(f"{term} was not defined!")
-            except Exception as e:
-                print(e)
+            # pylint: disable=broad-except
+            except Exception as error:
+                print(error)
                 try:
                     await message.reply("Sorry, an error has occurred.")
-                except Exception as e2:
-                    print(e2)
+                # pylint: disable=broad-except
+                except Exception as safe_error:
+                    print(safe_error)
 
     @commands.command("whatis")
     async def lookup_definition(self, ctx: commands.Context):
@@ -130,16 +142,22 @@ class DefinitionCog(commands.Cog, name="Glossary Commands"):
 
                     for row in rows:
                         if len(row) > 0 and row["Term"].lower() == term.lower():
-                            response = f"**{term}**: '{row['Definition']}'\n    *({row['Author']}, {row['Date']})*."
+                            response = f"**{term}**: '{row['Definition']}'" \
+                                       f"\n    *({row['Author']}, {row['Date']})*."
                             break
 
                 if response is None:
-                    await message.reply(f"'{term}' is not defined, but this might help:\nhttps://duckduckgo.com/?q=%22{term}%22+USD497+KSDE+Kansas")
+                    await message.reply(
+                        f"'{term}' is not defined, but this might help:"
+                        f"\nhttps://duckduckgo.com/?q=%22{term}%22+USD497+KSDE+Kansas"
+                    )
                 else:
                     await message.reply(response)
-            except Exception as e:
-                print(e)
+            # pylint: disable=broad-except
+            except Exception as error:
+                print(error)
                 try:
                     await message.reply("Sorry, an error has occurred.")
-                except Exception as e2:
-                    print(e2)
+                # pylint: disable=broad-except
+                except Exception as safe_error:
+                    print(safe_error)

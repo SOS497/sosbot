@@ -1,11 +1,15 @@
-from discord.ext import commands
-import discord.message as mess
+"""Commands to handle saving, retrieving, and maintaining items associated with different datasets
+into a Google Sheet"""
 import logging
 import re
-from math import floor
 from datetime import datetime as dt
+# pylint: disable=no-name-in-module
+from math import floor
 
-from sosbot.bot import (SaucedBot, CONFIG_DATASET_GSHEET)
+import discord.message as mess
+from discord.ext import commands
+
+from sosbot.bot import (SOSBot, CONFIG_DATASET_GSHEET)
 
 logging.basicConfig(level=logging.INFO)
 
@@ -16,7 +20,10 @@ SHEETS = [
 
 
 class DatasetCog(commands.Cog, name="Topic / Dataset Commands"):
-    def __init__(self, bot: SaucedBot):
+    """Cog that collects commands related to managing and retrieving dataset information"""
+
+    def __init__(self, bot: SOSBot):
+        """Initialize the cog, including the gspread service used to access the Sheet"""
         self.bot = bot.discord.bot
         self.datasets = bot.google.config.get(CONFIG_DATASET_GSHEET)
         self.sheets_service = bot.google.get_gspread()
@@ -49,17 +56,21 @@ class DatasetCog(commands.Cog, name="Topic / Dataset Commands"):
                     sheet = spreadsheet.worksheet(key)
                     rows = sheet.get_all_records()
 
-                    sheet.append_row([dataset, url, description, message.author.display_name, dt.now().strftime("%x")])
-                    sheet.sort((1, 'asc'), range=f"A2:E{len(rows)+2}")
+                    sheet.append_row([
+                        dataset, url, description, message.author.display_name,
+                        dt.now().strftime("%x")
+                    ])
+                    sheet.sort((1, 'asc'), range=f"A2:E{len(rows) + 2}")
 
                 await message.reply(f"'{dataset}' now includes '{url}'")
-            except Exception as e:
-                print(e)
+            # pylint: disable=broad-except
+            except Exception as error:
+                print(error)
                 try:
                     await message.reply("Sorry, an error has occurred.")
-                except Exception as e2:
-                    print(e2)
-
+                # pylint: disable=broad-except
+                except Exception as safe_error:
+                    print(safe_error)
 
     @commands.command("clear-dataset")
     async def remove_from_dataset(self, ctx: commands.Context):
@@ -90,21 +101,25 @@ class DatasetCog(commands.Cog, name="Topic / Dataset Commands"):
                     rows = sheet.get_all_records()
 
                     for idx, row in enumerate(rows):
-                        if len(row) > 1 and row["Dataset"].lower() == dataset.lower() and row["URL"].lower() == url.lower():
+                        if len(row) > 1 \
+                                and row["Dataset"].lower() == dataset.lower() \
+                                and row["URL"].lower() == url.lower():
                             found_index = idx
                             break
 
                 if found_index > -1:
-                    sheet.delete_row(found_index+2)
+                    sheet.delete_row(found_index + 2)
                     await message.reply(f"{url} has been removed from {dataset}.")
                 else:
                     await message.reply(f"{url} was not found in {dataset}!")
-            except Exception as e:
-                print(e)
+            # pylint: disable=broad-except
+            except Exception as error:
+                print(error)
                 try:
                     await message.reply("Sorry, an error has occurred.")
-                except Exception as e2:
-                    print(e2)
+                # pylint: disable=broad-except
+                except Exception as safe_error:
+                    print(safe_error)
 
     @commands.command("dataset")
     async def get_dataset(self, ctx: commands.Context):
@@ -135,20 +150,26 @@ class DatasetCog(commands.Cog, name="Topic / Dataset Commands"):
 
                     for row in rows:
                         if len(row) > 0 and row["Dataset"].lower() == dataset.lower():
-                            ds_rows.append(f"{row['Description']} *({row['Author']}, {row['Date']})*\n"
-                                           f"{row['URL']}")
+                            ds_rows.append(
+                                f"{row['Description']} *({row['Author']}, {row['Date']})*\n"
+                                f"{row['URL']}"
+                            )
 
                 if len(ds_rows) > 0:
-                    response = f"Dataset **{dataset}** contains {len(ds_rows)} entries:\n\n" + "\n\n".join(ds_rows)
+                    response = f"Dataset **{dataset}** contains {len(ds_rows)} entries:\n\n" + \
+                               "\n\n".join(ds_rows)
+
                     await message.reply(response)
                 else:
                     await message.reply(f"'{dataset}' has no associated content!")
-            except Exception as e:
-                print(e)
+            # pylint: disable=broad-except
+            except Exception as error:
+                print(error)
                 try:
                     await message.reply("Sorry, an error has occurred.")
-                except Exception as e2:
-                    print(e2)
+                # pylint: disable=broad-except
+                except Exception as safe_error:
+                    print(safe_error)
 
     @commands.command("datasets")
     async def list_datasets(self, ctx: commands.Context):
@@ -170,22 +191,24 @@ class DatasetCog(commands.Cog, name="Topic / Dataset Commands"):
 
                         for row in rows:
                             if len(row) > 0:
-                                ds = row['Dataset']
-                                count = dss.get(ds) or 0
-                                dss[ds] = count+1
+                                dataset = row['Dataset']
+                                count = dss.get(dataset) or 0
+                                dss[dataset] = count + 1
 
                 response = []
-                for ds, count in dss.items():
-                    response.append(f"* **{ds}** ({count} items)")
+                for dataset, count in dss.items():
+                    response.append(f"* **{dataset}** ({count} items)")
 
                 await message.reply(
                     f"{len(dss)} datasets found:\n\n" +
                     "\n".join(dss) +
                     "\n\nUse !dataset <name> for more information"
                 )
-            except Exception as e:
-                print(e)
+            # pylint: disable=broad-except
+            except Exception as error:
+                print(error)
                 try:
                     await message.reply("Sorry, an error has occurred.")
-                except Exception as e2:
-                    print(e2)
+                # pylint: disable=broad-except
+                except Exception as safe_error:
+                    print(safe_error)

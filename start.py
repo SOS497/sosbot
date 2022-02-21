@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+"""Basic startup script for the SOSBot Discord bot"""
+
 from sosbot.bot import load_bot
 from sosbot.cogs.definitions import DefinitionCog
 from sosbot.cogs.datasets import DatasetCog

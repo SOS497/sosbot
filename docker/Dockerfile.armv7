@@ -1,0 +1,11 @@
+FROM arm32v7/python:buster
+
+WORKDIR /home/pi/sosbot
+
+COPY requirements.txt ./
+COPY start.py ./
+COPY sosbot ./sosbot
+
+RUN pip install -r ./requirements.txt
+
+CMD ["./start.py"]
