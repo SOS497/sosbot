@@ -1,12 +1,11 @@
 """Commands to handle saving, retrieving, and maintaining term definitions into a Google Sheet"""
 import logging
 # pylint: disable=no-name-in-module
+from disnake import Message
+from disnake.ext import commands
 from math import floor
 import re
 from datetime import datetime as dt
-
-import discord.message as mess
-from discord.ext import commands
 
 from sosbot.bot import (SOSBot, CONFIG_DEFINITION_GSHEET)
 
@@ -36,7 +35,7 @@ class DefinitionCog(commands.Cog, name="Glossary Commands"):
         Usage: !define <term> as <the-definition>
         """
 
-        message: mess.Message = ctx.message
+        message: Message = ctx.message
         if message.author.id != self.bot.user.id:
             try:
                 match = re.match(r"!define\s+(.+)\s*([:=]| as )\s*(.+)", message.content)
@@ -80,7 +79,7 @@ class DefinitionCog(commands.Cog, name="Glossary Commands"):
         Usage: !undefine <term>
         """
 
-        message: mess.Message = ctx.message
+        message: Message = ctx.message
         if message.author.id != self.bot.user.id:
             try:
                 match = re.match(r"!undefine\s+(.+)\s*", message.content)
@@ -123,7 +122,7 @@ class DefinitionCog(commands.Cog, name="Glossary Commands"):
 
         Usage: !whatis <term>
         """
-        message: mess.Message = ctx.message
+        message: Message = ctx.message
         if message.author.id != self.bot.user.id:
             try:
                 match = re.match(r"!whatis\s+(.+)\s*", message.content)

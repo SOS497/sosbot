@@ -3,7 +3,7 @@ from os import environ
 from os.path import join
 
 import gspread
-from discord.ext import commands
+from disnake.ext import commands
 from google.oauth2 import service_account
 from googleapiclient import discovery
 from ruamel.yaml import YAML

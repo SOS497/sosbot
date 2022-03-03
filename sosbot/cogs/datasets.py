@@ -4,10 +4,9 @@ import logging
 import re
 from datetime import datetime as dt
 # pylint: disable=no-name-in-module
+from disnake.ext import commands
+from disnake.message import Message
 from math import floor
-
-import discord.message as mess
-from discord.ext import commands
 
 from sosbot.bot import (SOSBot, CONFIG_DATASET_GSHEET)
 
@@ -38,7 +37,7 @@ class DatasetCog(commands.Cog, name="Topic / Dataset Commands"):
         NOTE: dataset name CANNOT contain spaces.
         """
 
-        message: mess.Message = ctx.message
+        message: Message = ctx.message
         if message.author.id != self.bot.user.id:
             try:
                 match = re.match(r"!set-dataset\s+([\S]+)\s+([\S]+)(\s+(.*))?", message.content)
@@ -82,7 +81,7 @@ class DatasetCog(commands.Cog, name="Topic / Dataset Commands"):
         NOTE: dataset name CANNOT contain spaces.
         """
 
-        message: mess.Message = ctx.message
+        message: Message = ctx.message
         if message.author.id != self.bot.user.id:
             try:
                 match = re.match(r"!clear-dataset\s+([\S]+)\s+([\S]+)\s*", message.content)
@@ -131,7 +130,7 @@ class DatasetCog(commands.Cog, name="Topic / Dataset Commands"):
         NOTE: dataset name CANNOT contain spaces.
         """
 
-        message: mess.Message = ctx.message
+        message: Message = ctx.message
         if message.author.id != self.bot.user.id:
             try:
                 match = re.match(r"!dataset\s+([\S]+)\s*", message.content)
@@ -179,7 +178,7 @@ class DatasetCog(commands.Cog, name="Topic / Dataset Commands"):
         Usage: !datasets
         """
 
-        message: mess.Message = ctx.message
+        message: Message = ctx.message
         if message.author.id != self.bot.user.id:
             try:
                 dss = {}
