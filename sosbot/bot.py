@@ -23,6 +23,7 @@ CONFIG_DISCORD_SECTION = "discord"
 CONFIG_GOOGLE_SECTION = "google"
 
 CONFIG_DISCORD_TOKEN = "token"
+CONFIG_DISCORD_SAVEDIR = "save-dir"
 
 CONFIG_DEFINITION_GSHEET = "definitions-sheet"
 CONFIG_DATASET_GSHEET = "datasets-sheet"

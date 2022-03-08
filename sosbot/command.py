@@ -5,7 +5,7 @@ import click
 from sosbot.bot import load_bot
 from sosbot.cogs.definitions import DefinitionCog
 from sosbot.cogs.datasets import DatasetCog
-from sosbot.cogs.threads import ThreadsCog
+from sosbot.cogs.threads import Conversations
 from sosbot.cogs.hello import HelloCommand
 
 
@@ -15,9 +15,9 @@ def start():
 
     bot = load_bot()
     bot.discord.add_cog(HelloCommand(bot))
-    # bot.discord.add_cog(DefinitionCog(bot))
-    # bot.discord.add_cog(DatasetCog(bot))
-    # bot.discord.add_cog(ThreadsCog(bot))
+    bot.discord.add_cog(DefinitionCog(bot))
+    bot.discord.add_cog(DatasetCog(bot))
+    bot.discord.add_cog(Conversations(bot))
 
     print("Starting sosbot for Discord.")
     bot.discord.start()
