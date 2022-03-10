@@ -1,3 +1,4 @@
+[![Pylint](https://github.com/SOS497/sosbot/actions/workflows/pylint.yml/badge.svg)](https://github.com/SOS497/sosbot/actions/workflows/pylint.yml)
 [![CodeQL](https://github.com/SOS497/sosbot/actions/workflows/codeql-analysis.yml/badge.svg?branch=main)](https://github.com/SOS497/sosbot/actions/workflows/codeql-analysis.yml)
 [![Snyk Scan](https://github.com/SOS497/sosbot/actions/workflows/snyk-scan.yml/badge.svg)](https://github.com/SOS497/sosbot/actions/workflows/snyk-scan.yml)
 
