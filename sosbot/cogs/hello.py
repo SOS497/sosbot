@@ -1,26 +1,14 @@
-import json
-from typing import List
+"""Basic Hello, World type commands for the bot library"""
 
-from disnake import Message, MessageReference
-from disnake.ext.commands import Cog, command, Context, slash_command
+from disnake.ext.commands import Cog, command, Context
 
 
-class HelloCommand(Cog):
+class HelloCommand(Cog, name="\n\nHello Commands"):
+    """Basic commands to test bot features. Similar to Hello, World programs."""
+
     @command(name="hi")
-    async def say(self, ctx: Context):
-        message: Message = ctx.message
-        messages = [message]
+    @staticmethod
+    async def say(ctx: Context, *, name: str):
+        """Just say hi, and repeat the message the user sent."""
 
-        ref: MessageReference = message.reference
-        while ref is not None:
-            message = await ctx.channel.fetch_message(ref.message_id)
-            messages.append(message)
-            ref = message.reference
-
-        lines = []
-        for m in messages:
-            lines.append(f"{m.created_at} **{m.author.display_name}:** {m.content}")
-
-        response = "\n".join(lines)
-        await ctx.send(f"Hi {ctx.message.author.display_name}. Reply thread:\n\n{response}")
-
+        await ctx.send(f"Hi {ctx.message.author.display_name} ({name}).")

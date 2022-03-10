@@ -14,7 +14,7 @@ def start():
     """Startup the bot"""
 
     bot = load_bot()
-    bot.discord.add_cog(HelloCommand(bot))
+    # bot.discord.add_cog(HelloCommand(bot))
     bot.discord.add_cog(DefinitionCog(bot))
     bot.discord.add_cog(DatasetCog(bot))
     bot.discord.add_cog(Conversations(bot))

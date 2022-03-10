@@ -1,23 +1,21 @@
 #!/usr/bin/env python3
+"""Setuptools"""
 
 from setuptools import setup, find_packages
-import sys
 
-version='1.1.0'
-
-with open('requirements.txt', 'r') as f:
-  reqs = [line.strip() for line in f.readlines()]
+with open('requirements.txt', 'r', encoding="utf-8") as f:
+    reqs = [line.strip() for line in f.readlines()]
 
 setup(
     zip_safe=True,
     name='sosbot',
-    version=version,
+    version="1.1.0",
     long_description="Discord bot created for SOS 497",
     classifiers=[
-      "Development Status :: 3 - Alpha",
-      "Intended Audience :: Developers",
-      "License :: OSI Approved :: GNU General Public License (GPL)",
-      "Programming Language :: Python :: 3",
+        "Development Status :: 3 - Alpha",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: GNU General Public License (GPL)",
+        "Programming Language :: Python :: 3",
     ],
     keywords='discord, google googleapis',
     author='John Casey',
@@ -28,9 +26,8 @@ setup(
     install_requires=reqs,
     test_suite="tests",
     entry_points={
-      'console_scripts': [
-        'sosbot = sosbot:start',
-      ],
+        'console_scripts': [
+            'sosbot = sosbot:start',
+        ],
     }
 )
-

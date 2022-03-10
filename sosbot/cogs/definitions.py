@@ -1,11 +1,12 @@
 """Commands to handle saving, retrieving, and maintaining term definitions into a Google Sheet"""
 import logging
+from datetime import datetime as dt
 # pylint: disable=no-name-in-module
+from typing import Literal
+from math import floor
+
 from disnake import Message
 from disnake.ext import commands
-from math import floor
-import re
-from datetime import datetime as dt
 
 from sosbot.bot import (SOSBot, CONFIG_DEFINITION_GSHEET)
 
@@ -17,7 +18,7 @@ SHEETS = [
 ]
 
 
-class DefinitionCog(commands.Cog, name="Glossary Commands"):
+class DefinitionCog(commands.Cog, name="\n\nGlossary"):
     """Cog containing logic for managing and retrieving term definitions"""
 
     def __init__(self, bot: SOSBot):
@@ -28,23 +29,22 @@ class DefinitionCog(commands.Cog, name="Glossary Commands"):
         self.sheets_service = bot.google.get_gspread()
 
     @commands.command("define")
-    async def save_definition(self, ctx: commands.Context):
+    async def save_definition(self,
+                              ctx: commands.Context,
+                              term: str,
+                              _as: Literal['as'],
+                              *,
+                              definition: str):
         """
         Set the definition of a term
 
         Usage: !define <term> as <the-definition>
+        Usage: !define "<term> <words>" as <the-definition>
         """
 
         message: Message = ctx.message
         if message.author.id != self.bot.user.id:
             try:
-                match = re.match(r"!define\s+(.+)\s*([:=]| as )\s*(.+)", message.content)
-                if not match:
-                    await message.reply(f"Didn't understand: '{message.content[8:]}'")
-                    return
-
-                term = match[1].strip()
-                definition = match[3].strip()
                 idx = ALPHAS.index(term[0].upper())
                 key = SHEETS[floor(idx / 5)]
                 async with ctx.typing():
@@ -72,22 +72,16 @@ class DefinitionCog(commands.Cog, name="Glossary Commands"):
                     print(safe_error)
 
     @commands.command("undefine")
-    async def clear_definition(self, ctx: commands.Context):
+    async def clear_definition(self, ctx: commands.Context, term: str):
         """
         Clear the definition of a term
 
         Usage: !undefine <term>
+        Usage: !undefine "<term> <words>"
         """
 
-        message: Message = ctx.message
-        if message.author.id != self.bot.user.id:
+        if ctx.author.id != self.bot.user.id:
             try:
-                match = re.match(r"!undefine\s+(.+)\s*", message.content)
-                if not match:
-                    await message.reply(f"Didn't understand: '{message.content}'")
-                    return
-
-                term = match[1].strip()
                 idx = ALPHAS.index(term[0].upper())
                 key = SHEETS[floor(idx / 5)]
                 term_index = -1
@@ -103,34 +97,28 @@ class DefinitionCog(commands.Cog, name="Glossary Commands"):
 
                 if term_index > -1:
                     sheet.delete_row(term_index + 2)
-                    await message.reply(f"The definition of '{term}' has been removed.")
+                    await ctx.reply(f"The definition of '{term}' has been removed.")
                 else:
-                    await message.reply(f"{term} was not defined!")
+                    await ctx.reply(f"{term} was not defined!")
             # pylint: disable=broad-except
             except Exception as error:
                 print(error)
                 try:
-                    await message.reply("Sorry, an error has occurred.")
+                    await ctx.reply("Sorry, an error has occurred.")
                 # pylint: disable=broad-except
                 except Exception as safe_error:
                     print(safe_error)
 
     @commands.command("whatis")
-    async def lookup_definition(self, ctx: commands.Context):
+    async def lookup_definition(self, ctx: commands.Context, term: str):
         """
         Retrieve the definition of a term.
 
         Usage: !whatis <term>
+        Usage: !whatis "<term> <words>"
         """
-        message: Message = ctx.message
-        if message.author.id != self.bot.user.id:
+        if ctx.author.id != self.bot.user.id:
             try:
-                match = re.match(r"!whatis\s+(.+)\s*", message.content)
-                if not match:
-                    await message.reply(f"Didn't understand: '{message.content}'")
-                    return
-
-                term = match[1].strip()
                 idx = ALPHAS.index(term[0].upper())
                 key = SHEETS[floor(idx / 5)]
                 response = None
@@ -146,17 +134,17 @@ class DefinitionCog(commands.Cog, name="Glossary Commands"):
                             break
 
                 if response is None:
-                    await message.reply(
+                    await ctx.reply(
                         f"'{term}' is not defined, but this might help:"
                         f"\nhttps://duckduckgo.com/?q=%22{term}%22+USD497+KSDE+Kansas"
                     )
                 else:
-                    await message.reply(response)
+                    await ctx.reply(response)
             # pylint: disable=broad-except
             except Exception as error:
                 print(error)
                 try:
-                    await message.reply("Sorry, an error has occurred.")
+                    await ctx.reply("Sorry, an error has occurred.")
                 # pylint: disable=broad-except
                 except Exception as safe_error:
                     print(safe_error)

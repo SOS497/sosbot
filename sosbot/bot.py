@@ -4,6 +4,7 @@ from os.path import join
 
 import gspread
 from disnake.ext import commands
+from disnake.ext.commands import Context
 from google.oauth2 import service_account
 from googleapiclient import discovery
 from ruamel.yaml import YAML
@@ -23,6 +24,7 @@ CONFIG_DISCORD_SECTION = "discord"
 CONFIG_GOOGLE_SECTION = "google"
 
 CONFIG_DISCORD_TOKEN = "token"
+CONFIG_DISCORD_TEST_GUILDS = "test-guilds"
 CONFIG_DISCORD_SAVEDIR = "save-dir"
 
 CONFIG_DEFINITION_GSHEET = "definitions-sheet"
@@ -39,8 +41,21 @@ class DiscordBot:
         self._token = data.pop(CONFIG_DISCORD_TOKEN, None)
         self.config = data
         self.bot = commands.Bot(
-            command_prefix='!', description="SOS bot -> type `!help` to get started!"
+            command_prefix='!',
+            # test_guilds=data.pop(CONFIG_DISCORD_TEST_GUILDS, None),
+            # sync_commands_debug=True,
+            # sync_commands=False,
+            description="SOS bot -> type `!help` to get started!"
         )
+
+        self.bot.add_listener(self.on_command_error, "on_command_error")
+
+    @staticmethod
+    async def on_command_error(ctx: Context, error):
+        """Provide some response to the user when there's a command error"""
+
+        await ctx.send(f"Sorry, I don't understand ({error})")
+
 
     def add_cog(self, cog: commands.Cog):
         """Register a new cog (suite of commands) to the bot"""

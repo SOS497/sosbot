@@ -20,7 +20,7 @@ SHEETS = [
 ]
 
 
-class Conversations(Cog, name="Conversation Commands"):
+class Conversations(Cog, name="\n\nConversation Management"):
     """Cog containing logic for scraping and saving information from threads"""
 
     def __init__(self, bot: SOSBot):
@@ -29,8 +29,10 @@ class Conversations(Cog, name="Conversation Commands"):
         self.bot = bot
 
     @command(name="save-convo")
-    async def save_convo(self, ctx: Context):
-        """Find all messages in the reply stream
+    async def save_convo(self, ctx: Context, *, title: str):
+        """Save replies in this conversation.
+
+        Find all messages in the reply stream
         (backtracking from the current message to the start of the reply stream).
 
         Given that starting point, look through the message history from that point forward and
@@ -42,44 +44,46 @@ class Conversations(Cog, name="Conversation Commands"):
         """
         command_message: Message = ctx.message
         cmd: Command = ctx.command
-        convo_title = command_message.content[len(cmd.name) + 2:].strip()
-        if len(convo_title) < 1:
+        # convo_title = command_message.content[len(cmd.name) + 2:].strip()
+        if len(title) < 1:
             await command_message.reply(f"Usage: !{cmd.name} CONVERSATION TITLE")
             return
 
         starting_point, in_thread = await self._find_thread(command_message, ctx)
         if starting_point is not None:
             with ctx.typing():
-                storage_path = self._format_storage_path(ctx, ctx.channel.name, convo_title)
+                storage_path = self._format_storage_path(ctx, ctx.channel.name, title)
                 file = self._write_messages(
                     sorted(in_thread.values(), key=lambda x: x.created_at),
                     storage_path,
-                    convo_title,
+                    title,
                     ctx
                 )
 
                 await command_message.reply(
-                    f"Saved conversation to: {ctx.guild.name}/{ctx.channel.name}/{convo_title}",
+                    f"Saved conversation to: {ctx.guild.name}/{ctx.channel.name}/{title}",
                     file=file
                 )
         else:
             await command_message.reply("Cannot find a conversation to save!")
 
     @command(name="make-thread")
-    async def make_thread(self, ctx: Context):
-        """Find all messages in the reply stream
+    # pylint disable=too-many-locals
+    async def make_thread(self, ctx: Context, *, title: str):
+        """Create attachment thread from replies in this conversation.
+
+        Find all messages in the reply stream
         (backtracking from the current message to the start of the reply stream).
 
         Given that starting point, look through the message history from that point forward and
         track any messages that are replies to this original message (or one of its own replies).
-        Then, use this set of messages to construct a new Discord thread with the given title.
+        Then, use this set of messages to construct attachment new Discord thread with the given
+        title.
 
         USAGE: !make-thread THREAD TITLE
         """
 
         command_message: Message = ctx.message
-        cmd: Command = ctx.command
-        thread_title = command_message.content[len(cmd.name)+2:].strip()
 
         starting_point, in_thread = await self._find_thread(command_message, ctx)
         if starting_point is not None:
@@ -91,40 +95,43 @@ class Conversations(Cog, name="Conversation Commands"):
                     replied_user=True
                 )
                 fork_point = await command_message.reply(
-                    f"Thread: **{thread_title}**",
+                    f"Thread: **{title}**",
                     allowed_mentions=allowed_mentions
                 )
 
                 thread: Thread = await ctx.channel.create_thread(
-                    name=thread_title, message=fork_point
+                    name=title, message=fork_point
                 )
 
                 sent = {}
-                for m in sorted(in_thread.values(), key=lambda x: x.created_at):
-                    ref = m.reference
+                for msg in sorted(in_thread.values(), key=lambda x: x.created_at):
+                    ref = msg.reference
                     if ref is not None:
                         ref = sent[ref.message_id]
 
                     files = []
-                    for a in m.attachments:
-                        files.append(await a.to_file())
+                    for attachment in msg.attachments:
+                        files.append(await attachment.to_file())
 
-                    tm = await thread.send(
-                        f"<@{m.author.id}> said: {m.content}",
+                    thread_msg = await thread.send(
+                        f"<@{msg.author.id}> said: {msg.content}",
                         files=files,
                         reference=ref,
                         allowed_mentions=allowed_mentions
                     )
 
-                    sent[m.id] = tm.to_reference()
+                    sent[msg.id] = thread_msg.to_reference()
         else:
             await command_message.reply(
-                "This message is not a response! Try responding to a message with this command."
+                "This message is not attachment response! "
+                "Try responding to attachment message with this command."
             )
 
     @command(name="save-thread")
     async def save_thread(self, ctx: Context):
-        """Retrieve the message contents of a Discord thread, and save it to a file with the
+        """Save contents of a thread.
+
+        Retrieve the message contents of a Discord thread, and save it to a file with the
         thread's title.
 
         Usage: !save-thread
@@ -147,7 +154,9 @@ class Conversations(Cog, name="Conversation Commands"):
 
     @command(name="list-convos")
     async def list_convos(self, ctx: Context):
-        """Retrieve the list of saved conversations for the current channel on the current server.
+        """List saved conversations & threads.
+
+        Retrieve the list of saved conversations for the current channel on the current server.
 
         Usage: !list-convos
         """
@@ -158,26 +167,28 @@ class Conversations(Cog, name="Conversation Commands"):
         await ctx.reply(f"The following conversations have been saved:\n\n{response}")
 
     @command(name="load-convo")
-    async def load_convo(self, ctx: Context):
-        """Retrieve the list of threads for the current channel on the current server.
+    async def load_convo(self, ctx: Context, *, title: str):
+        """Retrieve a conversation or thread for download.
+
+        Retrieve the list of threads for the current channel on the current server.
 
         Usage: !load-convo TITLE
         """
         command_message: Message = ctx.message
         cmd: Command = ctx.command
-        convo_path = command_message.content[len(cmd.name) + 2:].strip()
-        if len(convo_path) < 1:
+        # convo_path = command_message.content[len(cmd.name) + 2:].strip()
+        if len(title) < 1:
             await command_message.reply(f"Usage: !{cmd.name} CHANNEL/TITLE\n"
                                         f"Try !list-convos for more.")
             return
 
-        docpath = self._format_storage_path(ctx, ctx.channel.name, convo_path)
+        docpath = self._format_storage_path(ctx, ctx.channel.name, title)
 
         if os.path.exists(docpath):
             file = File(docpath)
             await ctx.reply(file=file)
         else:
-            await ctx.reply(f"No conversation found for that channel/title")
+            await ctx.reply("No conversation found for that channel/title")
 
     def _format_storage_dir(self, ctx: Context, channel_subpath: str) -> str:
         """Format an appropriate storage directory based on server name and channel name.
@@ -212,7 +223,7 @@ class Conversations(Cog, name="Conversation Commands"):
             os.makedirs(os.path.dirname(storage_path))
 
         last_date = None
-        with open(storage_path, 'w') as filestore:
+        with open(storage_path, 'w', encoding="utf-8") as filestore:
             filestore.write(
                 f"# {title}\n\n"
                 f"**NOTE:** This conversation was recorded in {ctx.channel.name}, "
@@ -220,9 +231,9 @@ class Conversations(Cog, name="Conversation Commands"):
             )
 
             for message in messages:
-                dt = message.created_at.replace(tzinfo=pytz.timezone("US/Central"))
-                datestr = dt.strftime("%x")
-                timestr = dt.strftime("%X")
+                msg_date = message.created_at.replace(tzinfo=pytz.timezone("US/Central"))
+                datestr = msg_date.strftime("%x")
+                timestr = msg_date.strftime("%X")
                 if datestr != last_date:
                     filestore.write(f"\n## {datestr}\n")
                     last_date = datestr
@@ -253,10 +264,8 @@ class Conversations(Cog, name="Conversation Commands"):
         else:
             in_thread[message.id] = message
 
-        async for m in ctx.channel.history(after=message.created_at, oldest_first=True):
-            if m.reference is not None and m.reference.message_id in in_thread:
-                in_thread[m.id] = m
+        async for msg in ctx.channel.history(after=message.created_at, oldest_first=True):
+            if msg.reference is not None and msg.reference.message_id in in_thread:
+                in_thread[msg.id] = msg
 
         return starting_point, in_thread
-
-

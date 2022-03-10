@@ -3,10 +3,11 @@ into a Google Sheet"""
 import logging
 import re
 from datetime import datetime as dt
+from math import floor
+
 # pylint: disable=no-name-in-module
 from disnake.ext import commands
 from disnake.message import Message
-from math import floor
 
 from sosbot.bot import (SOSBot, CONFIG_DATASET_GSHEET)
 
@@ -18,7 +19,7 @@ SHEETS = [
 ]
 
 
-class DatasetCog(commands.Cog, name="Topic / Dataset Commands"):
+class DatasetCog(commands.Cog, name="\n\nDoc Collections / Datasets"):
     """Cog that collects commands related to managing and retrieving dataset information"""
 
     def __init__(self, bot: SOSBot):
