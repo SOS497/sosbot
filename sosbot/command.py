@@ -6,7 +6,7 @@ from sosbot.bot import load_bot
 from sosbot.cogs.definitions import DefinitionCog
 from sosbot.cogs.datasets import DatasetCog
 from sosbot.cogs.threads import Conversations
-from sosbot.cogs.hello import HelloCommand
+# from sosbot.cogs.hello import HelloCommand
 
 
 @click.command()

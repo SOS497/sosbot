@@ -3,6 +3,7 @@
 from disnake.ext.commands import Cog, command, Context
 
 
+# pylint disable=too-few-public-methods
 class HelloCommand(Cog, name="\n\nHello Commands"):
     """Basic commands to test bot features. Similar to Hello, World programs."""
 
