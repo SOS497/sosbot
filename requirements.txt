@@ -6,3 +6,4 @@ disnake
 ruamel.yaml
 click
 pytz
+protobuf>=6.33.5 # not directly required, pinned by Snyk to avoid a vulnerability
